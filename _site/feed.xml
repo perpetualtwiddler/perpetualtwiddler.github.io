@@ -6,9 +6,82 @@
 </description>
     <link>http://perpetualtwiddler.github.io/</link>
     <atom:link href="http://perpetualtwiddler.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 05 Apr 2015 20:10:54 +0530</pubDate>
-    <lastBuildDate>Sun, 05 Apr 2015 20:10:54 +0530</lastBuildDate>
+    <pubDate>Sat, 30 May 2015 13:08:24 +0530</pubDate>
+    <lastBuildDate>Sat, 30 May 2015 13:08:24 +0530</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>Setting up a compact RHEL 6.4 (Santiago) VirtualBox VM</title>
+        <description>&lt;p&gt;Create new VM in VirtualBox GUI, allocate at least a 12GB hard disk.  Edit these &lt;code&gt;Settings&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Enable “Shared Clipboard” under &lt;code&gt;General -&amp;gt; Advanced&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Under &lt;code&gt;Storage&lt;/code&gt;, make the RHEL 6.4 ISO DVD available in the CD/DVD drive&lt;/li&gt;
+  &lt;li&gt;Edit &lt;code&gt;Network&lt;/code&gt; settings if required (I tend to use “Bridged Adapter”)&lt;/li&gt;
+  &lt;li&gt;Add a directory if required under &lt;code&gt;Shared Folders&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Install the minimal set of packages.&lt;/p&gt;
+
+&lt;p&gt;Reboot, copy contents of the RHEL 6.4 ISO DVD on the local hard disk.&lt;/p&gt;
+
+&lt;p&gt;Install VirtualBox Guest Additions (&lt;code&gt;Devices -&amp;gt; Guest Additions ISO&lt;/code&gt;):&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Find and run &lt;code&gt;./VBoxLinuxAdditions.sh&lt;/code&gt;.  This might fail complaining of missing packages&lt;/li&gt;
+  &lt;li&gt;Use &lt;code&gt;rpm -ivh &amp;lt;pkgname&amp;gt;&lt;/code&gt; to install the named missing packages from the copied contents of the ISO&lt;/li&gt;
+  &lt;li&gt;Rerun &lt;code&gt;./VBoxLinuxAdditions.sh&lt;/code&gt;.  Installation should succeed but for failures about X display (to be fixed later)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Reboot, create a new user in the RHEL VM.  Confirm the directory named
+in the &lt;code&gt;Shared Folders&lt;/code&gt; settings is accessible to &lt;code&gt;root&lt;/code&gt;.  Add the new
+user to the &lt;code&gt;vboxsf&lt;/code&gt; group: &lt;code&gt;usermod -G vboxsf newuname&lt;/code&gt;. Relogin into
+the new user’s account, verify the shared folder is readable &amp;amp; writable.
+Check output of &lt;code&gt;groups&lt;/code&gt; command if required.&lt;/p&gt;
+
+&lt;p&gt;Copy contents of the RHEL 6.4 ISO into the shared folder to setup a local yum repository using &lt;code&gt;createrepo&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;To run &lt;code&gt;createrepo&lt;/code&gt;, install these packages using &lt;code&gt;rpm&lt;/code&gt; : &lt;code&gt;createrepo&lt;/code&gt;, &lt;code&gt;deltarpm&lt;/code&gt;, &lt;code&gt;python-deltarpm&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Run &lt;code&gt;createrepo&lt;/code&gt; in the shared folder containing ISO contents: &lt;code&gt;createrepo . -g Server/repodata/*-comps-rhel6-Server.xml.gz&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Add a &lt;code&gt;/etc/yum.repos.d/rhel64santiagoiso.repo&lt;/code&gt; file with &lt;code&gt;baseurl&lt;/code&gt; pointing to the directory in which createrepo was run:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;
+[RHEL64ISO]
+name=RHEL64ISO
+baseurl=file:///media/sf_rhel64santiago/rhel64yumrepo/
+enabled=1
+gpgcheck=0
+&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Next, &lt;code&gt;yum clean all &amp;amp;&amp;amp; yum update &amp;amp;&amp;amp; yum makecache&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Ensure &lt;code&gt;yum list&lt;/code&gt; and &lt;code&gt;yum grouplist&lt;/code&gt; produce long lists.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Install the basic graphical environment packages: &lt;code&gt;yum groupinstall
+&quot;Desktop&quot; &quot;Desktop Platform&quot; &quot;X Window System&quot;&lt;/code&gt; Avoid installing the
+&lt;code&gt;Fonts&lt;/code&gt; group, instead install individual fonts packages as required.
+The &lt;code&gt;Fonts&lt;/code&gt; group includes packages amounting to over 100MB.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Make graphical boot the default if required: change default run level to 5 (from 3) in &lt;code&gt;/etc/inittab&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Reinstall the VirtualBox Guest Additions package, this time around no failure should be reported&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Sat, 30 May 2015 00:00:00 +0530</pubDate>
+        <link>http://perpetualtwiddler.github.io/virtualbox/rhel/2015/05/30/setting-up-rhel-6.4-santiago-vm.html</link>
+        <guid isPermaLink="true">http://perpetualtwiddler.github.io/virtualbox/rhel/2015/05/30/setting-up-rhel-6.4-santiago-vm.html</guid>
+        
+        <category>minimal</category>
+        
+        
+        <category>virtualbox</category>
+        
+        <category>rhel</category>
+        
+      </item>
     
       <item>
         <title>Identifying package a file belongs to</title>
@@ -104,15 +177,15 @@ APT::Install-Suggests &amp;quot;0&amp;quot;;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt
 
 </description>
         <pubDate>Sun, 05 Apr 2015 00:00:00 +0530</pubDate>
-        <link>http://perpetualtwiddler.github.io/debian/ubuntu/avoid-bloat/2015/04/05/avoid-recommended-suggested-packages.html</link>
-        <guid isPermaLink="true">http://perpetualtwiddler.github.io/debian/ubuntu/avoid-bloat/2015/04/05/avoid-recommended-suggested-packages.html</guid>
+        <link>http://perpetualtwiddler.github.io/debian/ubuntu/2015/04/05/avoid-recommended-suggested-packages.html</link>
+        <guid isPermaLink="true">http://perpetualtwiddler.github.io/debian/ubuntu/2015/04/05/avoid-recommended-suggested-packages.html</guid>
+        
+        <category>avoid-bloat</category>
         
         
         <category>debian</category>
         
         <category>ubuntu</category>
-        
-        <category>avoid-bloat</category>
         
       </item>
     
